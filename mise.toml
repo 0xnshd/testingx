@@ -1,0 +1,11 @@
+[tools]
+go = "latest"
+golangci-lint = "latest"
+"go:golang.org/x/vuln/cmd/govulncheck" = "latest"
+
+[env]
+GIT_AUTHOR_NAME = "Nishad Wadwekar"
+GIT_AUTHOR_EMAIL = "nishad.wadwekar@gmail.com"
+GIT_COMMITTER_NAME = "Nishad Wadwekar"
+GIT_COMMITTER_EMAIL = "nishad.wadwekar@gmail.com"
+
