@@ -9,11 +9,11 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-var errMatcher func(err error, want any) bool = func(err error, want any) bool {
-	return errors.Is(err, want.(error))
+var errMatcher func(got, want any) bool = func(got, want any) bool {
+	return errors.Is(got.(error), want.(error))
 }
 
-func SetDefaultErrMatcher(f func(err error, want any) bool) {
+func SetDefaultErrMatcher(f func(got, want any) bool) {
 	errMatcher = f
 }
 

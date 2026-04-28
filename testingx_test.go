@@ -161,25 +161,25 @@ func Test_SetDefaultErrMatcher(t *testing.T) {
 	errA := errors.New("a")
 	errB := errors.New("b")
 
-	defaultMatcher := func(err error, want any) bool {
-		return errors.Is(err, want.(error))
+	defaultMatcher := func(got, want any) bool {
+		return errors.Is(got.(error), want.(error))
 	}
 
 	tests := []struct {
 		name        string
-		matcher     func(error, any) bool
+		matcher     func(any, any) bool
 		wantFailed  bool
 		wantMessage string
 	}{
 		{
 			name:        "Rejects",
-			matcher:     func(err error, want any) bool { return false },
+			matcher:     func(got, want any) bool { return false },
 			wantFailed:  true,
 			wantMessage: fmt.Sprintf("got error %v, want error %v", errA, errB),
 		},
 		{
 			name:        "Accepts",
-			matcher:     func(err error, want any) bool { return true },
+			matcher:     func(got, want any) bool { return true },
 			wantFailed:  false,
 			wantMessage: "", // no message check for this case
 		},
