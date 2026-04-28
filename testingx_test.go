@@ -34,7 +34,7 @@ func spyRun(fn func()) {
 	wg.Wait()
 }
 
-func Test_CheckErr(t *testing.T) {
+func Test_CheckWErr(t *testing.T) {
 	errA := errors.New("a")
 	errB := errors.New("b")
 
@@ -92,7 +92,7 @@ func Test_CheckErr(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			spy := &spyT{TB: t}
 			spyRun(func() {
-				testingx.CheckErr(spy, tc.got, tc.want, tc.err, tc.wantErr)
+				testingx.CheckWErr(spy, tc.got, tc.want, tc.err, tc.wantErr)
 			})
 
 			if !spy.failed {
@@ -161,25 +161,25 @@ func Test_SetDefaultErrMatcher(t *testing.T) {
 	errA := errors.New("a")
 	errB := errors.New("b")
 
-	defaultMatcher := func(got, want any) bool {
-		return errors.Is(got.(error), want.(error))
+	defaultMatcher := func(got, want error) bool {
+		return errors.Is(got, want)
 	}
 
 	tests := []struct {
 		name        string
-		matcher     func(any, any) bool
+		matcher     func(error, error) bool
 		wantFailed  bool
 		wantMessage string
 	}{
 		{
 			name:        "Rejects",
-			matcher:     func(got, want any) bool { return false },
+			matcher:     func(got, want error) bool { return false },
 			wantFailed:  true,
 			wantMessage: fmt.Sprintf("got error %v, want error %v", errA, errB),
 		},
 		{
 			name:        "Accepts",
-			matcher:     func(got, want any) bool { return true },
+			matcher:     func(got, want error) bool { return true },
 			wantFailed:  false,
 			wantMessage: "", // no message check for this case
 		},
@@ -192,7 +192,7 @@ func Test_SetDefaultErrMatcher(t *testing.T) {
 
 			spy := &spyT{TB: t}
 			spyRun(func() {
-				testingx.CheckErr(spy, nil, nil, errA, errB)
+				testingx.CheckWErr(spy, nil, nil, errA, errB)
 			})
 
 			if spy.failed != tc.wantFailed {

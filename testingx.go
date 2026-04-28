@@ -9,11 +9,11 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-var errMatcher func(got, want any) bool = func(got, want any) bool {
-	return errors.Is(got.(error), want.(error))
+var errMatcher func(got, want error) bool = func(got, want error) bool {
+	return errors.Is(got, want)
 }
 
-func SetDefaultErrMatcher(f func(got, want any) bool) {
+func SetDefaultErrMatcher(f func(got, want error) bool) {
 	errMatcher = f
 }
 
@@ -27,12 +27,12 @@ func ErrUnexpected(t testing.TB, got error) {
 	t.Errorf("unexpected error: %v", got)
 }
 
-func ErrExpected(t testing.TB, want any) {
+func ErrExpected(t testing.TB, want error) {
 	t.Helper()
 	t.Errorf("expected error %v, got nil", want)
 }
 
-func ErrMismatch(t testing.TB, got error, want any) {
+func ErrMismatch(t testing.TB, got, want error) {
 	t.Helper()
 	t.Errorf("got error %v, want error %v", got, want)
 }
@@ -53,13 +53,18 @@ func Check(t testing.TB, got, want any, opts ...cmp.Option) {
 	}
 }
 
-func CheckErr(t testing.TB, got, want any, gotErr error, wantErr any, opts ...cmp.Option) {
+func CheckErr(t testing.TB, gotErr, wantErr error) {
+	t.Helper()
+	if !errMatcher(gotErr, wantErr) {
+		ErrMismatch(t, gotErr, wantErr)
+	}
+}
+
+func CheckWErr(t testing.TB, got, want any, gotErr, wantErr error, opts ...cmp.Option) {
 	t.Helper()
 	switch {
 	case gotErr != nil && wantErr != nil:
-		if !errMatcher(gotErr, wantErr) {
-			ErrMismatch(t, gotErr, wantErr)
-		}
+		CheckErr(t, gotErr, wantErr)
 	case gotErr != nil && wantErr == nil:
 		ErrUnexpected(t, gotErr)
 	case gotErr == nil && wantErr != nil:
