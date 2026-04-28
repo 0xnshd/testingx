@@ -3,6 +3,7 @@ package testingx
 
 import (
 	"errors"
+	"reflect"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -41,8 +42,12 @@ func Mismatch(t testing.TB, diff string) {
 	t.Errorf("mismatch (-want +got):\n%s", diff)
 }
 
-func Check(t testing.TB, want, got any, opts ...cmp.Option) {
+func Check(t testing.TB, got, want any, opts ...cmp.Option) {
 	t.Helper()
+	if reflect.TypeOf(got) != reflect.TypeOf(want) {
+		TypeMismatch(t, got, want)
+		return
+	}
 	if diff := cmp.Diff(want, got, opts...); diff != "" {
 		Mismatch(t, diff)
 	}
